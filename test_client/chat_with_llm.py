@@ -1,11 +1,16 @@
 import json
 import requests
 import re
+import sys
+sys.path.append("/Users/sadanandupase/PycharmProjects/23AI")
+print(sys.path)
+import array
+from embeddings.generate_embeddings import generate_embeddings
 
 OLLAMA_URL = "http://localhost:11434/api/chat"
 MCP_URL = "http://localhost:8000/mcp/run"
 
-def call_llm_ollama(prompt):
+def call_llm_ollama(prompt, vec):
     system_prompt = open("prompt/system_prompt.txt").read()
 
     response = requests.post(OLLAMA_URL, json={
@@ -22,9 +27,9 @@ def call_llm_ollama(prompt):
         return None
     print(response.json())
     content = response.json()["message"]["content"]
-    return fix_llm_json(content)
+    return fix_llm_json(content, vec)
 
-def fix_llm_json(text):
+def fix_llm_json(text, vec):
     """
     Fix and parse JSON output from LLMs that might include:
     - Markdown code block (```json ... ```)
@@ -40,9 +45,14 @@ def fix_llm_json(text):
         text = re.sub(r"^```(?:json)?\s*", "", text)
         text = re.sub(r"\s*```$", "", text)
 
+
     # Try loading raw text first
     try:
-        return json.loads(text)
+        data = json.loads(text)
+        #making sure we pass embedding only when required
+        if vec and 'VECTOR_DISTANCE' in data['query']:
+            data["embedding"] = list(vec)
+        return data
     except json.JSONDecodeError:
         pass
 
@@ -62,7 +72,10 @@ def fix_llm_json(text):
         json_text = json_text.replace("'", '"')  # single → double quotes
         json_text = re.sub(r',\s*([}\]])', r'\1', json_text)  # remove trailing commas
 
-        return json.loads(json_text)
+        data = json.loads(json_text)
+        if vec:
+            data["embedding"] = list(vec)
+        return data
     except Exception as e:
         raise ValueError(f"⚠️ Failed to fix and parse JSON: {e}\nRaw text:\n{text}")
 
@@ -74,13 +87,25 @@ def call_mcp(json_payload):
 
 
 if __name__ == "__main__":
-    user_input = input("Ask your DB: ")
-    llm_response = call_llm_ollama(user_input)
-    print("LLM says:", llm_response)
+    while True:
+        user_input = input("Ask your DB: ")
+        if str.upper(user_input.strip("")) == "EXIT":
+            break
+        query_embeddings = generate_embeddings(user_input)
+        if query_embeddings:
+            emb_list = query_embeddings.embeddings[0]
+        else:
+            emb_list = None
+        if emb_list:
+            vec = array.array("f", emb_list)
+        else:
+            vec = None
+        llm_response = call_llm_ollama(user_input, vec)
+        print("LLM says:", llm_response)
 
-    try:
-        parsed = llm_response  # Better: use json.loads() if response is well-formed
-        result = call_mcp(parsed)
-        print("MCP Result:", result)
-    except Exception as e:
-        print("Error parsing or calling MCP:", e)
+        try:
+            parsed = llm_response  # Better: use json.loads() if response is well-formed
+            result = call_mcp(parsed)
+            print("MCP Result:", result)
+        except Exception as e:
+            print("Error parsing or calling MCP:", e)

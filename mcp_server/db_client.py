@@ -1,7 +1,9 @@
 import oracledb
 import os
+from typing import Optional, List
+import array
 
-wallet_path = "/Users/sadanandupase/PycharmProjects/trial/23AI"
+wallet_path = "/Users/sadanandupase/PycharmProjects/23AI"
 SERVICE_NAME = "m04vxfqnjt7h6fh0_high"
 print(wallet_path)
 connection = oracledb.connect(
@@ -12,10 +14,22 @@ connection = oracledb.connect(
     wallet_location=wallet_path
 )
 
-def run_query(sql: str):
+def run_query(sql: str, vector: Optional[List[float]] = None):
     cursor = connection.cursor()
-    cursor.execute(sql)
+    print(len(vector))
+    if vector is not None:
+        print("Executing cursor")
+        vector = array.array("f", vector)
+        print("created vector", type(vector))
+        cursor.execute(sql, [vector])
+        print("Executed cursor")
+    else:
+        cursor.execute(sql)
     cols = [col[0] for col in cursor.description]
+    print("fecthed columns", cols)
     rows = cursor.fetchall()
+    print("Got rows", rows)
+    for row in rows:
+        print(dict(zip(cols, row)))
     cursor.close()
     return [dict(zip(cols, row)) for row in rows]

@@ -1,0 +1,56 @@
+#########To Run#########
+- uvicorn mcp_server.main:app --reload
+- python test_client/chat_with_llm.py
+
+#######This was solved############
+- Loading onnx model did not work for nomic-embedding-model 
+- Most of the online tutorials are outdated , so it is a pain to make it work
+- LOAD_ONNX_MODEL_CLOUD , LOAD_ONNX_MODEL using DATA_PUMP_DIR both did not work
+- OML4Py did not work on mac as well dev box. 
+########Solution############
+
+Download embedding model from https://adwc4pm.objectstorage.us-ashburn-1.oci.customer-oci.com/p/VBRD9P8ZFWkKvnfhrWxkpPe8K03-JIoM5h_8EJyJcpE80c108fuUjg7R5L5O7mMZ/n/adwc4pm/b/OML-Resources/o/all_MiniLM_L12_v2_augmented.zip
+
+EXEC DBMS_CLOUD_ADMIN.ENABLE_RESOURCE_PRINCIPAL();
+
+BEGIN
+  DBMS_CLOUD.GET_OBJECT(
+    credential_name => 'OCI$RESOURCE_PRINCIPAL',
+    directory_name  => 'DATA_PUMP_DIR',
+    object_uri      => 'https://objectstorage.us-chicago-1.oraclecloud.com/n/axke9xehyrpc/b/ModelBucket/o/all_MiniLM_L12_v2.onnx'
+  );
+END;
+/
+
+
+BEGIN
+  DBMS_VECTOR.LOAD_ONNX_MODEL(
+    directory   => 'DATA_PUMP_DIR',
+    file_name   => 'all_MiniLM_L12_v2.onnx',
+    model_name  => 'all_MiniLM_L12_v2'
+    
+  );
+END;
+/
+
+SELECT DBMS_VECTOR.UTL_TO_EMBEDDING(
+         'User reported payment failure at checkout',
+         JSON('{"provider":"database","model":"all_MiniLM_L12_v2"}')
+       ) AS vec
+FROM dual;
+
+
+
+###################################################
+
+
+APIUser 
+apiuser
+fingerprint: 74:3c:f1:24:02:83:54:b5:26:b4:d5:6c:04:ca:c9:8b
+
+[DEFAULT]
+user=ocid1.user.oc1..aaaaaaaawbktedi4m5xnqbl3wce32dvszwbcqgvnk53qmjby5mabkxxpimza
+fingerprint=74:3c:f1:24:02:83:54:b5:26:b4:d5:6c:04:ca:c9:8b
+tenancy=ocid1.tenancy.oc1..aaaaaaaaclhhdny44loq3lqlxmkofnchqq4z3w34q37tjtj24usnmohqbwma
+region=us-chicago-1
+key_file=/Users/sadanandupase/PycharmProjects/23AI/apiuser-2025-07-04T06_23_01.915Z.pem # TODO
