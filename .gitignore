@@ -1,1 +1,7 @@
 Wallet_*.zip
+*.ora
+*.sso
+*.jks
+*.p12
+*.properties
+*.pem
