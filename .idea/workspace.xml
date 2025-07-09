@@ -5,15 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9a7ada04-20a9-445c-9fd2-c4cb0ec5a0bd" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/prompt/system_prompt_with embedding_outside.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Notes.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Notes.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/sample_schema.sql" beforeDir="false" afterPath="$PROJECT_DIR$/data/sample_schema.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/embeddings/insert_embeddings.py" beforeDir="false" afterPath="$PROJECT_DIR$/embeddings/insert_embeddings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mcp_server/db_client.py" beforeDir="false" afterPath="$PROJECT_DIR$/mcp_server/db_client.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/mcp_server/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/mcp_server/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prompt/system_prompt.txt" beforeDir="false" afterPath="$PROJECT_DIR$/prompt/system_prompt.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_client/chat_with_llm.py" beforeDir="false" afterPath="$PROJECT_DIR$/test_client/chat_with_llm.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
