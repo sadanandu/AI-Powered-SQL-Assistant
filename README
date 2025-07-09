@@ -1,43 +1,111 @@
-Wallet Expiry Date
------------------------
-This wallet was downloaded on 2025-06-29 04:32:34.393191 UTC.
-The SSL certificates provided in this wallet will expire on 2030-06-28 04:30:35.823764 UTC.
-In order to avoid any service interruptions due to an expired SSL certificate, you must re-download the wallet before this date.
+# 💡 AI-Powered Oracle 23ai Query Assistant (POC)
 
-Autonomous Database Tools and Resources
----------------------------------------
+This project is a proof-of-concept (POC) system that allows natural language questions to be converted into SQL or semantic search queries over data stored in Oracle Autonomous Database (ADB). It combines the power of Oracle 23ai's native vector search capabilities with a locally running LLM via Ollama to provide intelligent access to both structured and unstructured data.
 
-Database Actions
-----------------
-Load, explore, transform, model, and catalog your data. Use an SQL worksheet, build REST interfaces and low-code apps, manage users and connections, build and apply machine learning models. 
-Access Link:
+---
 
-https://GB5541780FFE419-M04VXFQNJT7H6FH0.adb.us-chicago-1.oraclecloudapps.com/ords/sql-developer
++-------------------+         +-------------------------+
+|                   |         |                         |
+|   User / Client   +-------->+    FastAPI MCP Server   |
+|                   |         |                         |
++--------+----------+         +-----------+-------------+
+         |                                |
+         |                                | Sends prompt + user query
+         |                                v
+         |                      +---------+---------+
+         |                      |                   |
+         |                      |   LLaMA 3.2 (LLM)  |
+         |                      |   via Ollama       |
+         |                      +---------+---------+
+         |                                |
+         |                Generates SQL or vector query
+         |                                v
+         |                      +---------+---------+
+         |                      |                   |
+         |                      | Oracle ADB (23ai) |
+         |                      | - customers table |
+         |                      | - documents table |
+         |                      | - vector search   |
+         |                      +---------+---------+
+         |                                |
+         |                Query results (structured or vector-based)
+         |                                v
+         +<-------------------------------+
+               Cleaned and formatted result
 
-Graph Studio
-------------
-Oracle Graph Studio lets you create scalable property graph databases. Graph Studio automates the creation of graph models and in-memory graphs from database tables. It includes notebooks and developer APIs that allow you to execute graph queries using PGQL (an SQL-like graph query language) and over 50 built-in graph algorithms. Graph Studio also offers dozens of visualization, including native graph visualization. 
-Access Link:
 
-https://GB5541780FFE419-M04VXFQNJT7H6FH0.adb.us-chicago-1.oraclecloudapps.com/graphstudio/
+## 🧱 System Components
 
-Oracle Application Express
---------------------------
-Oracle Application Express (APEX) is a low-code development platform that enables you to build scalable, secure enterprise apps that can be deployed anywhere. 
-Access Link:
+### 🗄️ Oracle Autonomous Database (ADB)
+- Stores two types of data:
+  - **Structured data**: e.g., customer names, emails, and cities.
+  - **Unstructured text**: e.g., complaints, occupations, languages.
+- Supports vector search through **Oracle 23ai built-in embedding models**.
+- Embeddings for documents are generated and stored inside the database itself.
 
-https://GB5541780FFE419-M04VXFQNJT7H6FH0.adb.us-chicago-1.oraclecloudapps.com/ords/apex
+### 🧠 Local LLM (LLaMA 3.2 via Ollama)
+- Interprets user questions and generates structured responses in JSON format.
+- Chooses between traditional SQL or semantic vector queries based on the nature of the question.
+- Hosted locally using [Ollama](https://ollama.com).
 
-Oracle Machine Learning User Interface
---------------------------------------
-The Oracle Machine Learning User Interface provides immediate access to the Oracle Machine Learning components and functionality on Autonomous Database, including OML Notebooks, OML AutoML UI, OML Models, and template example notebooks. Through OML Notebooks, users can develop notebooks comprised of SQL, PL/SQL, R, Python, and markdown paragraphs and use OML4SQL, OML4R, and OML4Py APIs.These APIs provide access to over 30 parallelized, scalable in-database machine learningalgorithms, supporting classification, regression, anomaly detection, clustering, associations, attribute importance, feature extraction, and times series forecasting, among others. Through OML4Py and OML4R, users can invoke user-defined Python and R functions in engines spawned and controlled by the database environment, with optional data-parallel and task-parallel invocation, as well as deploy those user-defined functions from SQL and REST APIs.
-Access Link:
+### 🌐 FastAPI Server (MCP Server)
+- Acts as the intermediary between the user interface, LLM, and the Oracle database.
+- Handles:
+  - Prompting the LLM with system instructions and user query
+  - Receiving and executing the generated SQL or vector query
+  - Returning formatted results to the user
 
-https://GB5541780FFE419-M04VXFQNJT7H6FH0.adb.us-chicago-1.oraclecloudapps.com/oml/
+---
 
-SODA Drivers
-------------
-Simple Oracle Document Access (SODA) is a set of APIs that let you work with JSON documents managed by the Oracle Database without needing to use SQL. SODA drivers are available for REST, Java, Node.js, Python, PL/SQL, and C. 
-Access Link:
+## 🔁 Data Flow Overview
 
-https://www.oracle.com/database/technologies/appdev/json.html#sodadrivers
+1. **User submits a natural language query**
+   - Example: *“What languages do customers speak in Mumbai?”*
+
+2. **FastAPI (MCP Server) sends the query and a predefined system prompt to LLaMA 3.2**
+   - The system prompt helps the model understand the available tables and how to decide which one to use.
+
+3. **LLM responds with a structured action**
+   - Example: A SQL statement that uses vector search to retrieve relevant documents.
+
+4. **The server runs the generated query against Oracle ADB**
+   - If semantic search is used, Oracle generates the query embedding using its built-in model.
+
+5. **Results are returned to the user**
+   - CLOB fields and vector distances are parsed and cleaned before formatting.
+
+---
+
+## 🔧 Technologies Used
+
+- **Oracle Autonomous Database (23ai)**
+- **Oracle Vector Search**
+- **LLaMA 3.2 (via Ollama)**
+- **FastAPI**
+- **Python + oracledb driver**
+
+---
+
+## 🚀 Highlights
+
+- No external vector DB needed — all vector storage and querying happens inside Oracle ADB.
+- Full use of Oracle's built-in `ALL_MINILM_L12_V2` model for both document and query embeddings.
+- LLM smartly decides between structured SQL and semantic queries.
+- Clean and fast FastAPI backend to support interactive usage and future UI integration.
+
+---
+
+## 📌 Status
+
+✅ Embeddings inserted  
+✅ LLM integrated via MCP server  
+✅ Vector queries working  
+✅ System prompt tuned for intelligent table usage  
+
+Next steps might include:
+- UI integration
+- Confidence scoring
+- Multi-modal document support (e.g., images, PDFs)
+
+
+
