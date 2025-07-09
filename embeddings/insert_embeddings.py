@@ -2,7 +2,7 @@ import os
 import array
 import oracledb
 from generate_embeddings import generate_embeddings
-WALLET_PATH = os.path.dirname(os.path.abspath(__file__))
+WALLET_PATH = "/Users/sadanandupase/PycharmProjects/23AI"
 
 # TNS name of your service from tnsnames.ora (usually ends with _high, _low, or _tp)
 SERVICE_NAME = "m04vxfqnjt7h6fh0_high"
@@ -29,10 +29,12 @@ print("Connected to Oracle Autonomous Database.")
 cursor = conn.cursor()
 
 # Sample record
-documents = [{"title" : "Customer languages",
-"content": "Customers from Mumbai tend to speak in marathi or hindi. while customers from Delhi are mainly speaking in Hindi"
-}, {"title": "Customer complaints", "content" : "There are more complains by people from Delhi"},
-            {"title": "Customer Occupation", "content": "Customers from Mumbai are having mixed occupation like salary and business while Delhi customers tend to have business as primary source of income"}]
+documents = [
+    {"title" : "Customer languages","content": "Customers from Mumbai tend to speak in marathi or hindi. while customers from Delhi are mainly speaking in Hindi"}, 
+    {"title": "Customer complaints", "content" : "There are more complaints by people from Delhi"},
+    {"title": "Customer Occupation", "content": "Customers from Mumbai are having mixed occupation like salary and business while Delhi customers tend to have business as primary source of income"},
+    {"title": "Customer Gender", "content": "There are more female customers in mumbai while delhi has more male customers"} ]
+
 
 for each_record in documents:
     title = each_record["title"]
@@ -48,10 +50,14 @@ for each_record in documents:
         print("Inserting embeddings")
         # Convert to Python array for upload
         vec = array.array("f", emb_list)
-        
+        sql = """
+        INSERT INTO documents (title, content, embedding)
+VALUES (:title, :content,
+        VECTOR_EMBEDDING(ALL_MINILM_L12_V2 USING :content AS data))
+        """
         cursor.execute(
-            "INSERT INTO documents (title, content, embedding) VALUES (:1, :2, :3)",
-            [title, content, vec]
+            sql,
+            {"title": title, "content": content}
         )
         
         conn.commit()

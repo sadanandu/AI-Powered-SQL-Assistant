@@ -16,7 +16,7 @@ CREATE TABLE documents (
   id        NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   title     VARCHAR2(200),
   content   CLOB,
-  embedding VECTOR(1536, FLOAT32)  -- ✅ Match your actual embedding size
+  embedding VECTOR(384, FLOAT32)  -- ✅ Match your actual embedding size
 );
 
 

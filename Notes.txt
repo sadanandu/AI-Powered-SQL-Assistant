@@ -54,3 +54,20 @@ fingerprint=74:3c:f1:24:02:83:54:b5:26:b4:d5:6c:04:ca:c9:8b
 tenancy=ocid1.tenancy.oc1..aaaaaaaaclhhdny44loq3lqlxmkofnchqq4z3w34q37tjtj24usnmohqbwma
 region=us-chicago-1
 key_file=/Users/sadanandupase/PycharmProjects/23AI/apiuser-2025-07-04T06_23_01.915Z.pem # TODO
+
+
+############################################################
+
+Tests
+1. what languages are spoken by customers ->  {Result->Succeeds, Generated sql -> SELECT title, content, VECTOR_DISTANCE(embedding, VECTOR_EMBEDDING(ALL_MINILM_L12_V2 USING \'languages spoken by customers\' AS data)) AS distance FROM documents ORDER BY distance FETCH FIRST 5 ROWS ONLY,
+                                         query response->fetches correct docs : {'results': [{'TITLE': 'Customer languages', 'CONTENT': 'Customers from Mumbai tend to speak in marathi or hindi. while customers from Delhi are mainly speaking in Hindi', 'DISTANCE': 0.4216364701065243}]} }
+2. what are occupations of customers -> {Result->Succeeds partially, Generated sql -> SELECT title, content, VECTOR_DISTANCE(embedding, VECTOR_EMBEDDING(ALL_MINILM_L12_V2 USING \'occupations of customers\' AS data)) AS distance FROM documents ORDER BY distance FETCH FIRST 5 ROWS ONLY,
+                                         query response->fetches documents but they dont satisfy distance criteria {'results': []} }
+3. how many different cities do our customers belong to? -> {Result->Succeeds, Generated sql -> SELECT COUNT(DISTINCT city) FROM customers,
+                                              query response->gives correct response {'results': [{'COUNT(DISTINCTCITY)': 2}]} }
+4. which city customers have complained more ? -> {Result-> Fails, Generated sql -> SELECT c.city, COUNT(*) as complaints_count, VECTOR_DISTANCE(embedding, VECTOR_EMBEDDING(ALL_MINILM_L12_V2 USING 'complaints' AS data)) AS distance FROM customers c JOIN documents d ON c.id = d.id GROUP BY c.city ORDER BY distance ASC FETCH FIRST 10 ROWS ONLY,
+                                              query response->Error received  : ORA-00979: "EMBEDDING": must appear in the GROUP BY clause or be used in an aggregate function }
+5. what all cities do our customers belong to ? -> {Result->Succeeds, Generated sql -> SELECT DISTINCT city FROM customers,
+                                              query response->Gives correct result as {'results': [{'CITY': 'Mumbai'}, {'CITY': 'Delhi'}]} }
+6. which language speaking customers have complained more ? -> {Result-> Fails, Generated sql -> SELECT title, content, COUNT(*) AS complaints FROM documents WHERE VECTOR_DISTANCE(embedding, VECTOR_EMBEDDING(ALL_MINILM_L12_V2 USING 'language spoken by customers' AS data)) < 0.5 GROUP BY title ORDER BY complaints DESC LIMIT 1,
+                                               query response->ORA-03049: SQL keyword 'LIMIT' is not syntactically valid following '...ORDER BY complaints DESC }

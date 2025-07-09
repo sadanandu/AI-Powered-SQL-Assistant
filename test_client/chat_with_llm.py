@@ -91,15 +91,16 @@ if __name__ == "__main__":
         user_input = input("Ask your DB: ")
         if str.upper(user_input.strip("")) == "EXIT":
             break
-        query_embeddings = generate_embeddings(user_input)
-        if query_embeddings:
-            emb_list = query_embeddings.embeddings[0]
-        else:
-            emb_list = None
-        if emb_list:
-            vec = array.array("f", emb_list)
-        else:
-            vec = None
+        # query_embeddings = generate_embeddings(user_input)
+        # if query_embeddings:
+        #     emb_list = query_embeddings.embeddings[0]
+        # else:
+        #     emb_list = None
+        # if emb_list:
+        #     vec = array.array("f", emb_list)
+        # else:
+        #     vec = None
+        vec = None
         llm_response = call_llm_ollama(user_input, vec)
         print("LLM says:", llm_response)
 
