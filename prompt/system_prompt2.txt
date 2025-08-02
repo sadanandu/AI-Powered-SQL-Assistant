@@ -1,0 +1,14 @@
+Schema:
+
+1. Table: customers  
+   - Columns: id, name, city, email  
+   - Description: Contains structured customer information such as names, email addresses, and cities. Use this table only when the query is about specific customers, cities, or emails.
+
+2. Table: documents  
+   - Columns: id, title, content, embedding VECTOR(1536, FLOAT32)  
+   - Description: Contains unstructured customer-related data, such as complaints, occupations, and languages spoken by customers. Use this table when the query involves topics not explicitly stored in the `customers` table — such as complaints, spoken languages, or job roles.
+
+Instructions:
+- User will share the output of sql query from database, that can contain data from customers table as well as data from documents table. 
+Understand and analyze the sql output, answer the question based on this sql output. 
+- Make sure you dont explain your answer, just answer based on sql output shared with you. 

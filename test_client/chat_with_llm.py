@@ -3,14 +3,14 @@ import requests
 import re
 import sys
 sys.path.append("/Users/sadanandupase/PycharmProjects/23AI")
-print(sys.path)
+#print(sys.path)
 import array
 from embeddings.generate_embeddings import generate_embeddings
 
 OLLAMA_URL = "http://localhost:11434/api/chat"
 MCP_URL = "http://localhost:8000/mcp/run"
 
-def call_llm_ollama(prompt, vec):
+def call_llm_ollama(prompt):
     system_prompt = open("prompt/system_prompt.txt").read()
 
     response = requests.post(OLLAMA_URL, json={
@@ -25,11 +25,35 @@ def call_llm_ollama(prompt, vec):
     if response.status_code != 200:
         print("Error from Ollama:", response.text)
         return None
-    print(response.json())
+    #print(response.json())
     content = response.json()["message"]["content"]
-    return fix_llm_json(content, vec)
+    return fix_llm_json(content)
 
-def fix_llm_json(text, vec):
+def interpret_sql_response(sql_output, prompt):
+    system_prompt = open("prompt/system_prompt2.txt").read()
+
+    user_prompt = f"""
+    Answer the question {prompt} based on sql output given {sql_output}  
+    """
+
+    response = requests.post(OLLAMA_URL, json={
+        "model": "llama3.2",  # or llama3, phi3, etc.
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ],
+        "stream": False
+    })
+
+    if response.status_code != 200:
+        print("Error from Ollama:", response.text)
+        return None
+    #print(response.json())
+    content = response.json()["message"]["content"]
+    #return fix_llm_json(content, vec)
+    return content
+
+def fix_llm_json(text):
     """
     Fix and parse JSON output from LLMs that might include:
     - Markdown code block (```json ... ```)
@@ -50,8 +74,8 @@ def fix_llm_json(text, vec):
     try:
         data = json.loads(text)
         #making sure we pass embedding only when required
-        if vec and 'VECTOR_DISTANCE' in data['query']:
-            data["embedding"] = list(vec)
+        # if vec and 'VECTOR_DISTANCE' in data['query']:
+        #     data["embedding"] = list(vec)
         return data
     except json.JSONDecodeError:
         pass
@@ -73,8 +97,8 @@ def fix_llm_json(text, vec):
         json_text = re.sub(r',\s*([}\]])', r'\1', json_text)  # remove trailing commas
 
         data = json.loads(json_text)
-        if vec:
-            data["embedding"] = list(vec)
+        # if vec:
+        #     data["embedding"] = list(vec)
         return data
     except Exception as e:
         raise ValueError(f"⚠️ Failed to fix and parse JSON: {e}\nRaw text:\n{text}")
@@ -100,13 +124,14 @@ if __name__ == "__main__":
         #     vec = array.array("f", emb_list)
         # else:
         #     vec = None
-        vec = None
-        llm_response = call_llm_ollama(user_input, vec)
+        # vec = None
+        llm_response = call_llm_ollama(user_input)
         print("LLM says:", llm_response)
 
         try:
             parsed = llm_response  # Better: use json.loads() if response is well-formed
             result = call_mcp(parsed)
             print("MCP Result:", result)
+            print(interpret_sql_response(result, user_input))
         except Exception as e:
             print("Error parsing or calling MCP:", e)

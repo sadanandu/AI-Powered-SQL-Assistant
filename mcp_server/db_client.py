@@ -34,20 +34,20 @@ def run_query(sql: str):
     print("fetched columns", cols)
     rows = cursor.fetchall()
     print("Got rows", rows)
-    result = []
-    if 'distance' in cols:
-        idx = cols.index('distance')
-    elif 'DISTANCE' in cols:
-        idx = cols.index('DISTANCE')
-    else:
-        idx = None
-    for row in rows:
-        print(dict(zip(cols, row))) 
-        if idx is not None:
-            if row[idx] <= 0.5:
-                result.append(row)
-        else:
-            result.append(row)
+    result = rows
+    # if 'distance' in cols:
+    #     idx = cols.index('distance')
+    # elif 'DISTANCE' in cols:
+    #     idx = cols.index('DISTANCE')
+    # else:
+    #     idx = None
+    # for row in rows:
+    #     print(dict(zip(cols, row))) 
+    #     if idx is not None:
+    #         if row[idx] <= 0.5:
+    #             result.append(row)
+    #     else:
+    #         result.append(row)
     cursor.close()
     result = [
         {

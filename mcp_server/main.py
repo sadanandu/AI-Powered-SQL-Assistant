@@ -24,7 +24,7 @@ async def run_sql(req: QueryRequest):
         results = run_query(req.query)
         print("Got results")
         res = {"results": results}
-        print(type(res))
+        #print(type(res))
         return JSONResponse(content={"results": results})
     except Exception as e:
         return {"error": str(e)}

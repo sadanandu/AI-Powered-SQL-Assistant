@@ -29,38 +29,87 @@ print("Connected to Oracle Autonomous Database.")
 cursor = conn.cursor()
 
 # Sample record
-documents = [
-    {"title" : "Customer languages","content": "Customers from Mumbai tend to speak in marathi or hindi. while customers from Delhi are mainly speaking in Hindi"}, 
-    {"title": "Customer complaints", "content" : "There are more complaints by people from Delhi"},
-    {"title": "Customer Occupation", "content": "Customers from Mumbai are having mixed occupation like salary and business while Delhi customers tend to have business as primary source of income"},
-    {"title": "Customer Gender", "content": "There are more female customers in mumbai while delhi has more male customers"} ]
+# documents = [
+#     {"title" : "Customer languages","content": "Customers from Mumbai tend to speak in marathi or hindi. while customers from Delhi are mainly speaking in Hindi"}, 
+#     {"title": "Customer complaints", "content" : "There are more complaints by people from Delhi"},
+#     {"title": "Customer Occupation", "content": "Customers from Mumbai are having mixed occupation like salary and business while Delhi customers tend to have business as primary source of income"},
+#     {"title": "Customer Gender", "content": "There are more female customers in mumbai while delhi has more male customers"} ]
 
+documents = [
+    {
+        "title": "Payment Failure - Manoj",
+        "content": "Customer reported failed transaction on the app using UPI. Tried twice; both times app timed out. Asked for status via support in Hindi. Seemed frustrated but calm."
+    },
+    {
+        "title": "Service Language Preference - Manoj",
+        "content": "Customer prefers communication in Marathi. Asked if support is available in Marathi for future interactions. Also wanted product labels in local language."
+    },
+    {
+        "title": "Incorrect Item - Andres",
+        "content": "Customer received wrong model of headphones. Instead of X2000, he got X1000. Called in Spanish, mentioned urgency and need for replacement before weekend trip."
+    },
+    {
+        "title": "Refund Delay - Andres",
+        "content": "Customer mentioned refund for incorrect product hasn’t arrived after 8 days. He sounded patient but disappointed."
+    },
+    {
+        "title": "App Navigation Issues - Bala",
+        "content": "Customer found app too cluttered. Buttons too small on older Android device. Preferred navigating in Tamil. Suggested cleaner interface."
+    },
+    {
+        "title": "Feedback on Support - Bala",
+        "content": "Happy with how fast support responded in Tamil. Requested a feedback form in local language. Appreciated agent’s patience."
+    },
+    {
+        "title": "Delivery Feedback - Gabriela",
+        "content": "Pleased with early delivery. Called to confirm whether product was shipped from Guadalajara warehouse. Suggested Spanish packaging."
+    },
+    {
+        "title": "Language Barrier - Gabriela",
+        "content": "Asked if documentation is available in Spanish. Found current guide only in English and hard to understand. Support promised to follow up."
+    },
+    {
+        "title": "UX Complaint - Andy",
+        "content": "Customer said dark mode causes contrast issues in new update. Also found keyboard navigation broken in desktop view. Suggested rollback."
+    },
+    {
+        "title": "Subscription Issue - Andy",
+        "content": "Renewal failed due to bank redirect error. Called support who fixed it. Appreciated the quick fix but wants a retry button next time."
+    },
+    {
+        "title": "Refund Delay - Geetha",
+        "content": "Refund request pending over 15 days. Agent said escalation in progress. Geetha was upset; wants faster processing. Mentioned legal route if delay persists."
+    },
+    {
+        "title": "Voice Recognition Glitch - Geetha",
+        "content": "Support call to voice assistant failed to pick up Malayalam phrases. Requested fix to multilingual support in IVR. Switched to English to continue."
+    }
+]
 
 for each_record in documents:
     title = each_record["title"]
     content = each_record["content"]
 
-    embeddings = generate_embeddings(content)
-    if embeddings:
-        emb_list = embeddings.embeddings[0]
-    else:
-        emb_list = []
-    
-    if emb_list:
-        print("Inserting embeddings")
-        # Convert to Python array for upload
-        vec = array.array("f", emb_list)
-        sql = """
-        INSERT INTO documents (title, content, embedding)
+    # embeddings = generate_embeddings(content)
+    # if embeddings:
+    #     emb_list = embeddings.embeddings[0]
+    # else:
+    #     emb_list = []
+    # 
+    # if emb_list:
+    print("Inserting embeddings")
+    # Convert to Python array for upload
+    #vec = array.array("f", emb_list)
+    sql = """
+    INSERT INTO documents (title, content, embedding)
 VALUES (:title, :content,
-        VECTOR_EMBEDDING(ALL_MINILM_L12_V2 USING :content AS data))
-        """
-        cursor.execute(
-            sql,
-            {"title": title, "content": content}
-        )
-        
-        conn.commit()
+    VECTOR_EMBEDDING(ALL_MINILM_L12_V2 USING :content AS data))
+    """
+    cursor.execute(
+        sql,
+        {"title": title, "content": content}
+    )
+    conn.commit()
 cursor.close()
 conn.close()
 print("done")

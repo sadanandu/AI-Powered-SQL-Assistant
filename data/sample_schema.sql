@@ -6,18 +6,60 @@ CREATE TABLE customers (
     PRIMARY KEY (id)
 );
 
-INSERT INTO customers (name, city, email) VALUES
-('Amit Sharma', 'Mumbai', 'amit@example.com'),
-('Neha Mehta', 'Delhi', 'neha@example.com'),
-('Rahul Joshi', 'Mumbai', 'rahul@example.com');
-
-
 CREATE TABLE documents (
   id        NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   title     VARCHAR2(200),
   content   CLOB,
   embedding VECTOR(384, FLOAT32)  -- ✅ Match your actual embedding size
 );
+
+INSERT INTO customers (name, city, email) VALUES ('Manoj', 'Mumbai', 'manoj@example.in');
+INSERT INTO customers (name, city, email) VALUES ('Andres', 'Mexico City', 'andres@example.mx');
+INSERT INTO customers (name, city, email) VALUES ('Bala', 'Chennai', 'bala@example.in');
+INSERT INTO customers (name, city, email) VALUES ('Gabriela', 'Guadalajara', 'gabriela@example.mx');
+INSERT INTO customers (name, city, email) VALUES ('Andy', 'San Francisco', 'andy@example.us');
+INSERT INTO customers (name, city, email) VALUES ('Geetha', 'Bengaluru', 'geetha@example.in');
+
+-- Insert call transcripts into the documents table
+
+INSERT INTO documents (title, content)
+VALUES
+('Payment Failure - Manoj', 
+ 'Customer reported failed transaction on the app using UPI. Tried twice; both times app timed out. Asked for status via support in Hindi. Seemed frustrated but calm.'),
+
+('Service Language Preference - Manoj', 
+ 'Customer prefers communication in Marathi. Asked if support is available in Marathi for future interactions. Also wanted product labels in local language.'),
+
+('Incorrect Item - Andres', 
+ 'Customer received wrong model of headphones. Instead of X2000, he got X1000. Called in Spanish, mentioned urgency and need for replacement before weekend trip.'),
+
+('Refund Delay - Andres', 
+ 'Customer mentioned refund for incorrect product hasn’t arrived after 8 days. He sounded patient but disappointed.'),
+
+('App Navigation Issues - Bala', 
+ 'Customer found app too cluttered. Buttons too small on older Android device. Preferred navigating in Tamil. Suggested cleaner interface.'),
+
+('Feedback on Support - Bala', 
+ 'Happy with how fast support responded in Tamil. Requested a feedback form in local language. Appreciated agent’s patience.'),
+
+('Delivery Feedback - Gabriela', 
+ 'Pleased with early delivery. Called to confirm whether product was shipped from Guadalajara warehouse. Suggested Spanish packaging.'),
+
+('Language Barrier - Gabriela', 
+ 'Asked if documentation is available in Spanish. Found current guide only in English and hard to understand. Support promised to follow up.'),
+
+('UX Complaint - Andy', 
+ 'Customer said dark mode causes contrast issues in new update. Also found keyboard navigation broken in desktop view. Suggested rollback.'),
+
+('Subscription Issue - Andy', 
+ 'Renewal failed due to bank redirect error. Called support who fixed it. Appreciated the quick fix but wants a retry button next time.'),
+
+('Refund Delay - Geetha', 
+ 'Refund request pending over 15 days. Agent said escalation in progress. Geetha was upset; wants faster processing. Mentioned legal route if delay persists.'),
+
+('Voice Recognition Glitch - Geetha', 
+ 'Support call to voice assistant failed to pick up Malayalam phrases. Requested fix to multilingual support in IVR. Switched to English to continue.');
+
 
 
 EXEC DBMS_CLOUD_ADMIN.ENABLE_RESOURCE_PRINCIPAL();

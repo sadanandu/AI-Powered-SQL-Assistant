@@ -1,3 +1,9 @@
+https://docs.oracle.com/en-us/iaas/autonomous-database-serverless/doc/select-ai-examples.html#GUID-F9C4BEFB-1570-430F-AB36-347F1A4B8A71
+
+https://mylearn.oracle.com/ou/course/oracle-ai-vector-search-fundamentals/140188
+
+
+
 #########To Run#########
 - uvicorn mcp_server.main:app --reload
 - python test_client/chat_with_llm.py
@@ -71,3 +77,52 @@ Tests
                                               query response->Gives correct result as {'results': [{'CITY': 'Mumbai'}, {'CITY': 'Delhi'}]} }
 6. which language speaking customers have complained more ? -> {Result-> Fails, Generated sql -> SELECT title, content, COUNT(*) AS complaints FROM documents WHERE VECTOR_DISTANCE(embedding, VECTOR_EMBEDDING(ALL_MINILM_L12_V2 USING 'language spoken by customers' AS data)) < 0.5 GROUP BY title ORDER BY complaints DESC LIMIT 1,
                                                query response->ORA-03049: SQL keyword 'LIMIT' is not syntactically valid following '...ORDER BY complaints DESC }
+                                               
+                                               
+                                               
+############################################
+Cohere trial key : l9aAr2LQ49u3LhYlE7jWEe7shtfXLRFVF67SRjfR
+
+EXEC DBMS_CLOUD.create_credential('COHERE_CRED', 'COHERE', 'l9aAr2LQ49u3LhYlE7jWEe7shtfXLRFVF67SRjfR');
+
+BEGIN  
+    DBMS_NETWORK_ACL_ADMIN.APPEND_HOST_ACE(
+         host => 'api.cohere.ai',
+         ace  => xs$ace_type(privilege_list => xs$name_list('http'),
+                             principal_name => 'ADMIN',
+                             principal_type => xs_acl.ptype_db)
+   );
+END;
+/
+
+BEGIN
+  DBMS_CLOUD_AI.create_profile(
+      'COHERE',
+      '{"provider": "cohere",
+        "credential_name": "COHERE_CRED",
+        "object_list": [{"owner": "ADMIN", "name":"customers"}, {"owner": "ADMIN", "name":"documents"}],
+        "model": "command-light"
+       }');
+end;
+/
+
+BEGIN
+     DBMS_CLOUD_AI.ENABLE_PROFILE(
+         profile_name    => 'COHERE'
+     );
+   END;
+   /
+
+EXEC DBMS_CLOUD_AI.set_profile('COHERE');
+
+SELECT DBMS_CLOUD_AI.GENERATE(prompt       => 'what languages are spoken by customers',
+                              profile_name => 'COHERE',
+                              action       => 'runsql')
+                              
+SELECT DBMS_CLOUD_AI.GENERATE(prompt       => 'how many different cities do our customers belong to',
+                              profile_name => 'COHERE',
+                              action       => 'runsql')
+
+
+With this 
+                              
