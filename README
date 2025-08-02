@@ -2,36 +2,6 @@
 
 This project is a proof-of-concept (POC) system that allows natural language questions to be converted into SQL or semantic search queries over data stored in Oracle Autonomous Database (ADB). It combines the power of Oracle 23ai's native vector search capabilities with a locally running LLM via Ollama to provide intelligent access to both structured and unstructured data.
 
----
-
-+-------------------+         +-------------------------+
-|                   |         |                         |
-|   User / Client   +-------->+    FastAPI MCP Server   |
-|                   |         |                         |
-+--------+----------+         +-----------+-------------+
-         |                                |
-         |                                | Sends prompt + user query
-         |                                v
-         |                      +---------+---------+
-         |                      |                   |
-         |                      |   LLaMA 3.2 (LLM)  |
-         |                      |   via Ollama       |
-         |                      +---------+---------+
-         |                                |
-         |                Generates SQL or vector query
-         |                                v
-         |                      +---------+---------+
-         |                      |                   |
-         |                      | Oracle ADB (23ai) |
-         |                      | - customers table |
-         |                      | - documents table |
-         |                      | - vector search   |
-         |                      +---------+---------+
-         |                                |
-         |                Query results (structured or vector-based)
-         |                                v
-         +<-------------------------------+
-               Cleaned and formatted result
 
 
 ## 🧱 System Components
