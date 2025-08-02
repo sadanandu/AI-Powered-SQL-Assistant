@@ -1,48 +1,52 @@
 # 💡 AI-Powered Oracle 23ai Query Assistant (POC)
 
-This project is a proof-of-concept (POC) system that allows natural language questions to be converted into SQL or semantic search queries over data stored in Oracle Autonomous Database (ADB). It combines the power of Oracle 23ai's native vector search capabilities with a locally running LLM via Ollama to provide intelligent access to both structured and unstructured data.
+This project is a proof-of-concept (POC) system that allows users to ask natural language questions and receive answers powered by Oracle Autonomous Database (ADBS) using both SQL and vector search. It integrates a locally running LLM via Ollama and a backend FastAPI-based MCP server that handles execution logic and communication with the database.
 
+The system uses a modular design, enabling intelligent routing of queries, SQL generation, and response interpretation — all handled locally.
 
+---
 
 ## 🧱 System Components
 
-### 🗄️ Oracle Autonomous Database (ADB)
-- Stores two types of data:
-  - **Structured data**: e.g., customer names, emails, and cities.
-  - **Unstructured text**: e.g., complaints, occupations, languages.
-- Supports vector search through **Oracle 23ai built-in embedding models**.
-- Embeddings for documents are generated and stored inside the database itself.
+### 👤 User
+- Inputs natural language questions.
+- Receives final human-readable answers.
 
-### 🧠 Local LLM (LLaMA 3.2 via Ollama)
-- Interprets user questions and generates structured responses in JSON format.
-- Chooses between traditional SQL or semantic vector queries based on the nature of the question.
-- Hosted locally using [Ollama](https://ollama.com).
+### 🧠 LLM on Ollama (LLaMA 3.2)
+- Interprets user queries and generates appropriate SQL (traditional or semantic).
+- Also interprets SQL responses if needed for better human readability.
+- Runs locally via [Ollama](https://ollama.com).
 
-### 🌐 FastAPI Server (MCP Server)
-- Acts as the intermediary between the user interface, LLM, and the Oracle database.
-- Handles:
-  - Prompting the LLM with system instructions and user query
-  - Receiving and executing the generated SQL or vector query
-  - Returning formatted results to the user
+### 🤖 SQL Assistant
+- Central orchestrator of the entire workflow.
+- Routes queries to the LLM, forwards generated SQL to the MCP server, and interprets final results.
+- Also performs intermediate logic for formatting or refining output before presenting to the user.
+
+### 🌐 MCP Server (FastAPI)
+- Receives SQL statements from the SQL Assistant.
+- Executes SQL on Oracle ADBS and returns results.
+- Acts as the executor, not the decision-maker.
+
+### 🗄️ Oracle Autonomous Database (ADBS)
+- Hosts structured and unstructured data.
+- Performs both standard SQL and vector-based semantic queries.
+- Embedding generation and storage is handled natively using Oracle's `ALL_MINILM_L12_V2` model.
 
 ---
 
 ## 🔁 Data Flow Overview
 
-1. **User submits a natural language query**
-   - Example: *“What languages do customers speak in Mumbai?”*
+1. **User submits a natural language query** to the SQL Assistant.
+2. **SQL Assistant forwards the query** to the local LLM on Ollama.
+3. **LLM generates a SQL query** (traditional or vector-based).
+4. **SQL Assistant sends the SQL** to the MCP server for execution.
+5. **MCP server executes the SQL** on Oracle ADBS and retrieves results.
+6. **Results are returned to the SQL Assistant** by the MCP server.
+7. **SQL Assistant may optionally send results to LLM** for interpretation.
+8. **LLM interprets and explains results** (optional).
+9. **Final human-readable output is shown to the user**.
 
-2. **FastAPI (MCP Server) sends the query and a predefined system prompt to LLaMA 3.2**
-   - The system prompt helps the model understand the available tables and how to decide which one to use.
-
-3. **LLM responds with a structured action**
-   - Example: A SQL statement that uses vector search to retrieve relevant documents.
-
-4. **The server runs the generated query against Oracle ADB**
-   - If semantic search is used, Oracle generates the query embedding using its built-in model.
-
-5. **Results are returned to the user**
-   - CLOB fields and vector distances are parsed and cleaned before formatting.
+This flow ensures both local processing and flexibility in adapting queries intelligently.
 
 ---
 
@@ -51,31 +55,31 @@ This project is a proof-of-concept (POC) system that allows natural language que
 - **Oracle Autonomous Database (23ai)**
 - **Oracle Vector Search**
 - **LLaMA 3.2 (via Ollama)**
-- **FastAPI**
+- **FastAPI (MCP Server)**
 - **Python + oracledb driver**
 
 ---
 
 ## 🚀 Highlights
 
-- No external vector DB needed — all vector storage and querying happens inside Oracle ADB.
-- Full use of Oracle's built-in `ALL_MINILM_L12_V2` model for both document and query embeddings.
-- LLM smartly decides between structured SQL and semantic queries.
-- Clean and fast FastAPI backend to support interactive usage and future UI integration.
+- 🧠 Fully local LLM with intelligent SQL generation.
+- 🗃 No external vector DB needed — all vector embedding and querying is native to Oracle ADBS.
+- ⚡ Smart switching between structured SQL and semantic vector search.
+- 🧩 Modular architecture for easy expansion (e.g., adding UI, confidence scoring, etc.).
+- 🔄 Optional interpretation of SQL results via LLM for more natural answers.
 
 ---
 
 ## 📌 Status
 
 ✅ Embeddings inserted  
-✅ LLM integrated via MCP server  
-✅ Vector queries working  
-✅ System prompt tuned for intelligent table usage  
+✅ Local LLM integrated via Ollama  
+✅ MCP server connected to Oracle ADBS  
+✅ Semantic and SQL querying tested  
+✅ Diagram-based architecture established  
 
-Next steps might include:
-- UI integration
-- Confidence scoring
-- Multi-modal document support (e.g., images, PDFs)
-
-
-
+### 🧪 Next Steps
+- UI development for better usability.
+- Add confidence scoring and query classification.
+- Explore multi-modal inputs (e.g., PDFs, images).
+- Implement user feedback loop for query refinement.
