@@ -8,7 +8,7 @@ SERVICE_NAME = "m04vxfqnjt7h6fh0_high"
 print(wallet_path)
 connection = oracledb.connect(
     user="admin",
-    password="Welcome_123#",
+    password="<PASSWD>",
     dsn=SERVICE_NAME,  # match what's in tnsnames.ora
     config_dir=wallet_path,
     wallet_location=wallet_path
