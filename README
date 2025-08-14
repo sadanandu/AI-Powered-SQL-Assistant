@@ -6,7 +6,7 @@ The system uses a modular design, enabling intelligent routing of queries, SQL g
 
 ---
 
-![Alt text](https://github.com/sadanandu/AI-Powered-SQL-Assistant/blob/main/system_design.png?raw=true)
+![Alt text](system_design.png)
 
 ## 🧱 System Components
 
