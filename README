@@ -7,6 +7,8 @@ The system uses a modular design, enabling intelligent routing of queries, SQL g
 ---
 
 ![Alt text](system_design.png)
+![Alt text](example.png)
+
 
 ## 🧱 System Components
 
